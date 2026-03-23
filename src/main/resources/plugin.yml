@@ -1,0 +1,16 @@
+name: carbon
+version: '1.0-SNAPSHOT'
+main: com.github.cybellereaper.carbon.Carbon
+api-version: '1.21'
+authors: [ Auuki, CybelleReaper ]
+website: https://github.com/cybellereaper
+commands:
+  pet:
+    description: Manage your pet
+    usage: /pet <list|summon|dismiss>
+    permission: petplugin.command.pet
+
+permissions:
+  petplugin.command.pet:
+    description: Allows use of pet commands
+    default: true
