@@ -97,11 +97,6 @@ src/main/resources/
 
 ## Development Notes
 
-- Main plugin entrypoint: `com.github.cybellereaper.carbon.Carbon`.
 - Command handling lives in `PetCommand`.
 - Prefer extending the `pets/talents` package for new talent behaviors.
 - Keep new systems injectable via constructors to preserve testability and clean wiring.
-
-## License
-
-No license file is currently present in this repository. Add a `LICENSE` file before public distribution.
