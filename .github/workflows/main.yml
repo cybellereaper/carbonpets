@@ -13,6 +13,9 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-test-release:
     runs-on: ubuntu-latest
@@ -24,13 +27,13 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
+          distribution: temurin
           java-version: '21'
-          distribution: 'temurin'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
@@ -38,12 +41,26 @@ jobs:
       - name: Run tests and build
         run: ./gradlew clean build
 
-      - name: Publish jars to GitHub Release
+      - name: Publish JARs to GitHub Release
         if: startsWith(github.ref, 'refs/tags/') && github.repository == 'cybellereaper/carbonpets'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" build/libs/*.jar \
-            --repo cybellereaper/carbonpets \
-            --generate-notes \
-            --verify-tag
+          shopt -s nullglob
+          jars=(build/libs/*.jar)
+
+          if [ ${#jars[@]} -eq 0 ]; then
+            echo "No JAR files found in build/libs"
+            exit 1
+          fi
+
+          if gh release view "${GITHUB_REF_NAME}" --repo cybellereaper/carbonpets >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" "${jars[@]}" \
+              --repo cybellereaper/carbonpets \
+              --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" "${jars[@]}" \
+              --repo cybellereaper/carbonpets \
+              --generate-notes \
+              --verify-tag
+          fi
