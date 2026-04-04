@@ -8,6 +8,7 @@ public record TalentExecutionContext(
         Plugin plugin,
         Player owner,
         LivingEntity pet,
-        PetDefinition definition
+        PetDefinition definition,
+        PetStatProfile stats
 ) {
 }

@@ -20,6 +20,7 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-launcher:1.10.2")
 }
 
+
 tasks {
     runServer {
         // Configure the Minecraft version for our task.
@@ -54,4 +55,9 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+
+
+tasks.test {
+    useJUnitPlatform()
 }

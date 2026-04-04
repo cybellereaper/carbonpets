@@ -42,7 +42,7 @@ public final class TalentEngine {
     }
 
     public void triggerManualTalents(ResolvedPet pet) {
-        TalentExecutionContext context = new TalentExecutionContext(plugin, pet.owner(), pet.petEntity(), pet.definition());
+        TalentExecutionContext context = contextOf(pet);
         boolean anyTriggered = false;
 
         for (ManualTalent talent : pet.definition().talents().manualTalents()) {
@@ -71,7 +71,7 @@ public final class TalentEngine {
     }
 
     private void runTalents(ResolvedPet pet) {
-        TalentExecutionContext context = new TalentExecutionContext(plugin, pet.owner(), pet.petEntity(), pet.definition());
+        TalentExecutionContext context = contextOf(pet);
 
         for (PassiveTalent passiveTalent : pet.definition().talents().passiveTalents()) {
             if (intervalGate.shouldRun(passiveRunKey(pet, passiveTalent), passiveTalent.interval())) {
@@ -85,10 +85,18 @@ public final class TalentEngine {
                 continue;
             }
 
-            if (chanceService.succeeds(randomProcTalent.procChance())) {
+            if (chanceService.succeeds(boostedProcChance(randomProcTalent.procChance(), context.stats()))) {
                 randomProcTalent.execute(context);
             }
         }
+    }
+
+    private double boostedProcChance(double baseProcChance, PetStatProfile stats) {
+        return Math.min(0.85D, baseProcChance * stats.value(PetStat.AGILITY));
+    }
+
+    private TalentExecutionContext contextOf(ResolvedPet pet) {
+        return new TalentExecutionContext(plugin, pet.owner(), pet.petEntity(), pet.definition(), pet.statProfile());
     }
 
     private void cleanup(ActivePet activePet) {

@@ -7,7 +7,7 @@ website: https://github.com/cybellereaper
 commands:
   pet:
     description: Manage your pet
-    usage: /pet <list|summon|dismiss>
+    usage: /pet <list|summon|dismiss|stats>
     permission: petplugin.command.pet
 
 permissions:

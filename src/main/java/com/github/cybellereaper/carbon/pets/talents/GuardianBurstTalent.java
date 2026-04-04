@@ -1,6 +1,7 @@
 package com.github.cybellereaper.carbon.pets.talents;
 
 import com.github.cybellereaper.carbon.pets.ManualTalent;
+import com.github.cybellereaper.carbon.pets.PetStat;
 import com.github.cybellereaper.carbon.pets.TalentExecutionContext;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -36,7 +37,8 @@ public final class GuardianBurstTalent implements ManualTalent {
             knockback.setY(0.35D);
 
             monster.setVelocity(knockback);
-            monster.damage(4.0D, context.pet());
+            double damage = 4.0D * context.stats().value(PetStat.POWER);
+            monster.damage(damage, context.pet());
         }
 
         context.pet().getWorld().spawnParticle(Particle.CRIT, context.pet().getLocation().add(0.0D, 0.8D, 0.0D), 25, 0.6D, 0.4D, 0.6D, 0.1D);
