@@ -22,7 +22,9 @@ public final class Carbon extends JavaPlugin {
 
         var petVisualService = new PetVisualService();
         var petCatalog = new PetCatalog();
-        this.petService = new PetService(petCatalog, petKeys, petVisualService);
+        var petGeneticsGenerator = new ThreadLocalPetGeneticsGenerator();
+        var petStatCalculator = new PetStatCalculator();
+        this.petService = new PetService(petCatalog, petKeys, petVisualService, petGeneticsGenerator, petStatCalculator);
         this.talentEngine = new TalentEngine(this, petService, cooldownService, intervalGate, chanceService);
 
         var petMovementPlanner = new PetMovementPlanner(PetControllerConfig.standard());

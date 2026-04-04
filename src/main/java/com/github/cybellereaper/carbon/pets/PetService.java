@@ -14,13 +14,23 @@ public final class PetService {
     private final PetCatalog petCatalog;
     private final PetKeys petKeys;
     private final PetVisualService petVisualService;
+    private final PetGeneticsGenerator petGeneticsGenerator;
+    private final PetStatCalculator petStatCalculator;
     private final Map<UUID, ActivePet> petsByOwnerId = new ConcurrentHashMap<>();
     private final Map<UUID, ActivePet> petsByEntityId = new ConcurrentHashMap<>();
 
-    public PetService(PetCatalog petCatalog, PetKeys petKeys, PetVisualService petVisualService) {
+    public PetService(
+            PetCatalog petCatalog,
+            PetKeys petKeys,
+            PetVisualService petVisualService,
+            PetGeneticsGenerator petGeneticsGenerator,
+            PetStatCalculator petStatCalculator
+    ) {
         this.petCatalog = petCatalog;
         this.petKeys = petKeys;
         this.petVisualService = petVisualService;
+        this.petGeneticsGenerator = petGeneticsGenerator;
+        this.petStatCalculator = petStatCalculator;
     }
 
     public Optional<PetDefinition> findDefinition(String petId) {
@@ -35,14 +45,19 @@ public final class PetService {
         despawnPet(owner.getUniqueId());
 
         LivingEntity petEntity = definition.spawner().spawn(owner, definition, petKeys);
-        ActivePet activePet = new ActivePet(owner.getUniqueId(), petEntity.getUniqueId(), definition.id());
+        ActivePet activePet = new ActivePet(
+                owner.getUniqueId(),
+                petEntity.getUniqueId(),
+                definition.id(),
+                petGeneticsGenerator.generate()
+        );
 
         petsByOwnerId.put(owner.getUniqueId(), activePet);
         petsByEntityId.put(petEntity.getUniqueId(), activePet);
 
         petVisualService.playSummonEffect(petEntity);
 
-        return new ResolvedPet(activePet, owner, petEntity, definition);
+        return toResolvedPet(activePet, owner, petEntity, definition);
     }
 
     public Optional<ResolvedPet> resolveByEntityId(UUID entityId) {
@@ -74,7 +89,7 @@ public final class PetService {
             return Optional.empty();
         }
 
-        return Optional.of(new ResolvedPet(activePet, owner, livingEntity, definition.get()));
+        return Optional.of(toResolvedPet(activePet, owner, livingEntity, definition.get()));
     }
 
     public boolean isOwnedPet(Player player, Entity entity) {
@@ -114,5 +129,10 @@ public final class PetService {
         for (UUID ownerId : new ArrayList<>(petsByOwnerId.keySet())) {
             despawnPet(ownerId);
         }
+    }
+
+    private ResolvedPet toResolvedPet(ActivePet activePet, Player owner, LivingEntity petEntity, PetDefinition definition) {
+        PetStatProfile statProfile = petStatCalculator.calculate(activePet.genetics());
+        return new ResolvedPet(activePet, owner, petEntity, definition, statProfile);
     }
 }

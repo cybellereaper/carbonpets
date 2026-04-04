@@ -6,8 +6,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class PetCommand implements CommandExecutor, TabCompleter {
@@ -43,6 +45,11 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (subCommand.equals("stats")) {
+            sendStats(player);
+            return true;
+        }
+
         if (!subCommand.equals("summon")) {
             sendUsage(player);
             return true;
@@ -59,8 +66,8 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        petService.summon(player, definition);
-        player.sendMessage("Summoned " + definition.displayName() + ".");
+        ResolvedPet pet = petService.summon(player, definition);
+        player.sendMessage("Summoned " + definition.displayName() + ". IV spread: " + summarizeSpread(pet.activePet().genetics().ivs().values()));
         return true;
     }
 
@@ -68,12 +75,45 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
         player.sendMessage("/pet list");
         player.sendMessage("/pet summon <id>");
         player.sendMessage("/pet dismiss");
+        player.sendMessage("/pet stats");
+    }
+
+    private void sendStats(Player player) {
+        ActivePet activePet = petService.activePets().stream()
+                .filter(pet -> pet.ownerId().equals(player.getUniqueId()))
+                .findFirst()
+                .orElse(null);
+
+        if (activePet == null) {
+            player.sendMessage("No active pet. Summon one first.");
+            return;
+        }
+
+        player.sendMessage("EV/IV stats for your active pet:");
+        player.sendMessage("IVs: " + summarizeSpread(activePet.genetics().ivs().values()));
+        player.sendMessage("EVs: " + summarizeSpread(activePet.genetics().evs().values()));
+    }
+
+    private String summarizeSpread(Map<PetStat, Integer> spreadValues) {
+        return Arrays.stream(PetStat.values())
+                .map(stat -> shortName(stat) + "=" + spreadValues.get(stat))
+                .collect(Collectors.joining(" "));
+    }
+
+    private String shortName(PetStat stat) {
+        return switch (stat) {
+            case VITALITY -> "VIT";
+            case POWER -> "POW";
+            case GUARD -> "GRD";
+            case AGILITY -> "AGI";
+            case SPIRIT -> "SPR";
+        };
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(List.of("list", "summon", "dismiss"), args[0]);
+            return filter(List.of("list", "summon", "dismiss", "stats"), args[0]);
         }
 
         if (args.length == 2 && "summon".equalsIgnoreCase(args[0])) {

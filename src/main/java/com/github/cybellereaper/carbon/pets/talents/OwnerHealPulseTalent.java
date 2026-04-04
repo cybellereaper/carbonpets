@@ -1,6 +1,7 @@
 package com.github.cybellereaper.carbon.pets.talents;
 
 import com.github.cybellereaper.carbon.pets.PassiveTalent;
+import com.github.cybellereaper.carbon.pets.PetStat;
 import com.github.cybellereaper.carbon.pets.TalentExecutionContext;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -32,8 +33,9 @@ public final class OwnerHealPulseTalent implements PassiveTalent {
         }
 
         double maxHealth = owner.getMaxHealth();
+        double healAmount = 1.0D * context.stats().value(PetStat.SPIRIT);
 
-        double nextHealth = Math.min(maxHealth, owner.getHealth() + 1.0D);
+        double nextHealth = Math.min(maxHealth, owner.getHealth() + healAmount);
         if (nextHealth <= owner.getHealth()) {
             return;
         }

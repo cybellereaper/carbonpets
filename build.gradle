@@ -16,7 +16,9 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
+
 
 tasks {
     runServer {
@@ -52,4 +54,9 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+
+
+tasks.test {
+    useJUnitPlatform()
 }

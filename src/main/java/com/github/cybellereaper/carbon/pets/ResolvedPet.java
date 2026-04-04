@@ -7,6 +7,7 @@ public record ResolvedPet(
         ActivePet activePet,
         Player owner,
         LivingEntity petEntity,
-        PetDefinition definition
+        PetDefinition definition,
+        PetStatProfile statProfile
 ) {
 }

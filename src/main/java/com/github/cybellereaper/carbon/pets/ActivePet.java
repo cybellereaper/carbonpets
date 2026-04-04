@@ -5,6 +5,7 @@ import java.util.UUID;
 public record ActivePet(
         UUID ownerId,
         UUID entityId,
-        String definitionId
+        String definitionId,
+        PetGenetics genetics
 ) {
 }
