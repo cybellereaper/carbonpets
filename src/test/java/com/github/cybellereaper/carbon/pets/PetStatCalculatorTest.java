@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.EnumMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PetStatCalculatorTest {
 
@@ -33,6 +34,11 @@ class PetStatCalculatorTest {
 
         assertEquals(1.45D, profile.value(PetStat.POWER), 0.0001D);
         assertEquals(1.20D, profile.value(PetStat.AGILITY), 0.0001D);
+    }
+
+    @Test
+    void calculate_rejectsNullGenetics() {
+        assertThrows(NullPointerException.class, () -> calculator.calculate(null));
     }
 
     private EnumMap<PetStat, Integer> allStats(int value) {

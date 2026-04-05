@@ -6,6 +6,15 @@ plugins {
 group = 'com.github.cybellereaper'
 version = '1.0-SNAPSHOT'
 
+ext {
+    versions = [
+        paperApi      : '26.1.1-R0.1-SNAPSHOT',
+        junitJupiter  : '5.10.2',
+        junitPlatform : '1.10.2',
+        minecraft     : '26.1.1'
+    ]
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -15,9 +24,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
-    testImplementation("org.junit.platform:junit-platform-launcher:1.10.2")
+    compileOnly("io.papermc.paper:paper-api:${versions.paperApi}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${versions.junitJupiter}")
+    testImplementation("org.junit.platform:junit-platform-launcher:${versions.junitPlatform}")
 }
 
 
@@ -26,11 +35,11 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+        minecraftVersion(versions.minecraft)
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

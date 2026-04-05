@@ -15,7 +15,7 @@ CarbonPets is a Paper/Spigot plugin that adds summonable companion pets with mov
 
 ## Requirements
 
-- **Java 21+** (recommended for modern Paper builds).
+- **Java 25+** (required for Paper 26.1.1 builds).
 - **Gradle** (or use the included Gradle wrapper once added).
 - A **Paper/Spigot-compatible server** using the API version declared in `plugin.yml`.
 
